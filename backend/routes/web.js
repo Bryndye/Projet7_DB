@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middlewares/auth');
+const multer = require('../middlewares/multer-config');
 
 const bookController = require('../controllers/bookController');
 const userController = require('../controllers/userController');
 
-router.get('/books/', auth,bookController.getAll);
-router.get('/books/:id', auth,bookController.getOne);
-router.post('/books/', auth,bookController.create);
+router.get('/books/',bookController.getAll);
+router.get('/books/:id',bookController.getOne);
+router.post('/books/', auth, multer,bookController.create);
 router.put('/books/:id', auth,bookController.modifyOne);
 router.delete('/books/:id', auth,bookController.deleteOne);
 

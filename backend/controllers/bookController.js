@@ -15,12 +15,16 @@ exports.getOne = (req, res, next) => {
 
 // POST
 exports.create = (req, res, next) => {
-    console.log(req.body);
-    delete req.body._id;
-    const book = new Book({
-        ...req.body // ... permet de recup toutes les infos de req
+    const object = JSON.parse(req.body.book);
+    delete object._id;
+    delete object._userId;
+    const bookObject = new Book({
+        ...object,
+        userId: req.auth.userId,
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     });
-    book.save()
+
+    bookObject.save()
         .then(() => res.status(201).json({message: 'Book post'}))
         .catch(error => res.status(400).json({error}));
 };
