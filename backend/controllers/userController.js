@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+
 exports.login = (req, res, next) => {
     User.findOne({ email: req.body.email })
         .then(user => {

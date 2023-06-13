@@ -22,4 +22,7 @@ app.use((req, res, next) => {
 const webRoutes = require('./routes/web');
 app.use('/api', webRoutes);
 
+const path = require('path');
+app.use('/images',express.static(path.join(__dirname, 'images')));
+
 module.exports = app;
