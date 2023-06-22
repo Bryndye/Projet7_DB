@@ -7,12 +7,12 @@ const bookController = require('../controllers/bookController');
 const userController = require('../controllers/userController');
 
 router.get('/books',bookController.getAll);
-// router.get('/books/bestrating',bookController.getThree);
+router.get('/books/bestrating',bookController.getTopRatedBooks);
 router.get('/books/:id',bookController.getOne);
 router.post('/books', auth, multer,bookController.create);
 router.put('/books/:id', auth, multer,bookController.modifyOne);
 router.delete('/books/:id', auth,bookController.deleteOne);
-// router.post('/books/:id/rating', auth, multer,bookController.create);
+router.post('/books/:id/rating', auth, multer,bookController.createRating);
 
 router.post('/auth/signup', userController.signup);
 router.post('/auth/login', userController.login);

@@ -14,8 +14,8 @@ exports.getOne = (req, res, next) => {
         .catch(error => res.status(400).json({error}));
 };
 
-exports.getThree = (req, res, next) => {
-    Book.find({_id:req.params.id})
+exports.getTopRatedBooks = (req, res, next) => {
+    Book.find().sort({averageRating: -1}).limit(3)
         .then(
             books => res.status(200).json(books)
         )
@@ -36,6 +36,33 @@ exports.create = (req, res, next) => {
     bookObject.save()
         .then(() => res.status(201).json({message: 'Book post'}))
         .catch(error => res.status(400).json({error}));
+};
+
+exports.createRating = async (req, res, next) => {
+    const bookId = req.params.id;
+    const userId = req.body.userId; 
+    const grade = req.body.rating;
+
+    const rating = { userId: userId, grade: grade };
+
+    try {
+        await Book.updateOne({ _id: bookId }, { $push: { ratings: rating } });
+
+        const book = await Book.findById(bookId);
+
+        // Calculer la nouvelle moyenne
+        let sum = 0;
+        book.ratings.forEach(rating => {
+            sum += rating.grade;
+        });
+        const averageRating = sum / book.ratings.length;
+
+        await Book.updateOne({ _id: bookId }, { averageRating: averageRating });
+
+        res.status(200).json({ message: 'Rating added and average updated!' });
+    } catch (error) {
+        res.status(400).json({ error });
+    }
 };
 
 // PUT
