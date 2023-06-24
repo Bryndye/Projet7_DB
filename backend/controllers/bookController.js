@@ -44,26 +44,33 @@ exports.createRating = async (req, res, next) => {
     const grade = req.body.rating;
 
     const rating = { userId: userId, grade: grade };
-
+    // si id user existe deja, return fct
     try {
-        await Book.updateOne({ _id: bookId }, { $push: { ratings: rating } });
-
         const book = await Book.findById(bookId);
+
+        // Vérifie si l'utilisateur a déjà noté le livre
+        const userHasAlreadyRated = book.ratings.some(rating => rating.userId === userId);
+        if (userHasAlreadyRated) {
+            return res.status(400).json({ message: 'User has already rated this book.' });
+        }
+
+        await Book.updateOne({ _id: bookId }, { $push: { ratings: rating } });
 
         // Calculer la nouvelle moyenne
         let sum = 0;
         book.ratings.forEach(rating => {
             sum += rating.grade;
         });
-        const averageRating = sum / book.ratings.length;
+        const averageRating = (sum / book.ratings.length).toFixed(2); // x,xx => numb
 
         await Book.updateOne({ _id: bookId }, { averageRating: averageRating });
-
-        res.status(200).json({ message: 'Rating added and average updated!' });
+        // renvoie Book object
+        res.status(200).json({ _id: bookId });
     } catch (error) {
         res.status(400).json({ error });
     }
 };
+
 
 // PUT
 exports.modifyOne = (req, res, next) => {
